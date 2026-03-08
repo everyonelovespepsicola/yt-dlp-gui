@@ -1,4 +1,4 @@
-﻿using System;
+﻿﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -15,8 +15,8 @@ namespace yt_dlp_gui.Wrappers {
             foreach (var source in sources) {
                 options.Add($"-i \"{source}\"");
             }
-            options.Add("-vcodec copy");
-            options.Add("-acodec copy");
+            options.Add("-c:v copy");
+            options.Add("-c:a copy");
             if (Path.GetExtension(target).ToLower() == ".mp4") options.Add("-c:s mov_text");
             if (overwrite) {
                 options.Add("-y");
@@ -31,8 +31,8 @@ namespace yt_dlp_gui.Wrappers {
         public static void Split(string target, string source, Chapters chapter) {
             var options = new List<string>();
             options.Add($"-accurate_seek -i \"{source}\"");
-            options.Add("-vcodec copy");
-            options.Add("-acodec copy");
+            options.Add("-c:v copy");
+            options.Add("-c:a copy");
             options.Add("-avoid_negative_ts make_zero");
             options.Add("-y");
             options.Add($"-ss \"{chapter.start_time}\"");

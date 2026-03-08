@@ -1,4 +1,4 @@
-﻿using Libs;
+﻿﻿using Libs;
 using Libs.Yaml;
 using Microsoft.Toolkit.Uwp.Notifications;
 using Newtonsoft.Json;
@@ -483,7 +483,8 @@ namespace yt_dlp_gui.Views {
                         .UseAria2(Data.UseAria2)
                         .LimitRate(Data.LimitRate)
                         .DownloadSections(Data.TimeRange)
-                        .SplitChapters(Data.selectedChapter, Data.TargetFile);
+                        .SplitChapters(Data.selectedChapter, Data.TargetFile)
+                        .EmbedMetadata(true);
 
                         switch (type) {
                             case DownloadType.Video:
@@ -761,21 +762,28 @@ namespace yt_dlp_gui.Views {
         }
     }
     public class LanguageConverter :IValueConverter {
+        private static readonly Dictionary<string, PropertyInfo> _propertyCache = new();
+        private static readonly object _lock = new();
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture) {
             // 檢查輸入值是否為字串
             if (!(value is string key))
                 return value;
 
-            // 利用反射機制查詢 Lang 物件是否包含指定的 key 屬性
-            var Lang = App.Lang.Status;
-            var propertyInfo = Lang.GetType().GetProperty(key, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
+            PropertyInfo propertyInfo;
+            lock (_lock) {
+                if (!_propertyCache.TryGetValue(key, out propertyInfo)) {
+                    // 利用反射機制查詢 Lang 物件是否包含指定的 key 屬性
+                    propertyInfo = App.Lang.Status.GetType().GetProperty(key, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
+                    _propertyCache[key] = propertyInfo; // Cache the result, even if it's null
+                }
+            }
 
             // 如果 Lang 物件不包含指定的 key 屬性，則返回空字串
             if (propertyInfo == null)
                 return key;
 
             // 如果 Lang 物件包含指定的 key 屬性，則返回相應的值
-            return propertyInfo.GetValue(Lang)?.ToString() ?? key;
+            return propertyInfo.GetValue(App.Lang.Status)?.ToString() ?? key;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) {
@@ -784,4 +792,3 @@ namespace yt_dlp_gui.Views {
         }
     }
 }
-

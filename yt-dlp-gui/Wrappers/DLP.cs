@@ -43,6 +43,7 @@ namespace yt_dlp_gui.Wrappers {
                     + "%(progress.eta)s" //6
                     + "\"";
                 Options["--windows-filenames"] = "";
+                Options["--no-warnings"] = "";
             }
         }
         public DLP LoadConfig(string path) {
@@ -105,6 +106,24 @@ namespace yt_dlp_gui.Wrappers {
         public DLP EmbedChapters(bool enable) {
             if (enable) {
                 Options["--embed-chapters"] = "";
+            }
+            return this;
+        }
+        public DLP EmbedMetadata(bool enable) {
+            if (enable) {
+                Options["--embed-metadata"] = "";
+            }
+            return this;
+        }
+        public DLP SponsorBlock(bool enable, string categories = "all") {
+            if (enable) {
+                Options["--sponsorblock-remove"] = categories.QS();
+            }
+            return this;
+        }
+        public DLP ConcurrentFragments(int count) {
+            if (count > 1) {
+                Options["--concurrent-fragments"] = count.ToString();
             }
             return this;
         }
